@@ -58,20 +58,16 @@ def pullImage(String imageName, String tag, String credentialsId = 'dockerhub-cr
  * @param exitCode   0 = never fail build, 1 = fail build if issues found (default: 0)
  */
 def scanImage(String imageName, String severity = 'HIGH,MEDIUM,LOW', int exitCode = 0) {
-    def vulnerabilities = sh(
-        script: """
-            docker run --rm \
-                -v /var/run/docker.sock:/var/run/docker.sock \
-                -v trivy-cache:/root/.cache \
-                aquasec/trivy:latest image \
-                --exit-code ${exitCode} \
-                --severity ${severity} \
-                --no-progress \
-                ${imageName}
-        """,
-        returnStdout: true
-    ).trim()
-    echo "Vulnerability Report:\n${vulnerabilities}"
+    sh """
+        docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v trivy-cache:/root/.cache \
+            aquasec/trivy:latest image \
+            --exit-code ${exitCode} \
+            --severity ${severity} \
+            --no-progress \
+            ${imageName}
+    """
 }
 
 /**
